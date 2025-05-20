@@ -24,7 +24,17 @@ div.stButton > button:first-child {background-color: #4CAF50; color: white; bord
 """, unsafe_allow_html=True)
 
 # Initialize Groq client
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+groq_api_key = os.getenv("GROQ_API_KEY")
+
+# If running on Streamlit Cloud, try to get from st.secrets
+if not groq_api_key and hasattr(st, 'secrets') and "GROQ_API_KEY" in st.secrets:
+    groq_api_key = st.secrets["GROQ_API_KEY"]
+    
+if not groq_api_key:
+    st.error("GROQ API key not found. Please set it in .env file for local development or in Streamlit secrets for cloud deployment.")
+    st.stop()
+
+client = Groq(api_key=groq_api_key)
 
 # Fitness knowledge base from Fit4Life Academy
 FITNESS_KNOWLEDGE = """
